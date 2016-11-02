@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "Context.h"
+#include <VirtualMachine.h>
 
 using namespace std;
 using namespace ling0;
@@ -14,7 +14,7 @@ bool blank(const string &line);
 int main() {
 	cout << "Welcome to Ling0 Interactive prompt." << endl;
 	string line;
-	Context context(cout);
+	VirtualMachine context(cout);
 	for (;;) {
 		cout << ">> ";
 		getline(cin, line);

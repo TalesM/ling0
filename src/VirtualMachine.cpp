@@ -5,7 +5,7 @@
  *      Author: Tales
  */
 
-#include "Context.h"
+#include "VirtualMachine.h"
 
 #include <boost/spirit/home/x3/char/char_class.hpp>
 #include <boost/spirit/home/x3/numeric/real.hpp>
@@ -22,12 +22,12 @@ using namespace ast;
 using namespace std;
 using namespace boost;
 
-Context::Context(std::ostream &out) :
+VirtualMachine::VirtualMachine(std::ostream &out) :
 		out(out) {
 
 }
 
-Context::~Context() {
+VirtualMachine::~VirtualMachine() {
 }
 
 template<typename ITERATOR>
@@ -41,7 +41,7 @@ Expression parse_numbers(ITERATOR first, ITERATOR last) {
 	return Expression{r};
 }
 
-std::string Context::exec(const std::string& code) {
+std::string VirtualMachine::exec(const std::string& code) {
 	try {
 		return to_string(solve(parse_numbers(code.begin(), code.end())));
 	} catch (std::exception& e) {
@@ -49,12 +49,12 @@ std::string Context::exec(const std::string& code) {
 	}
 }
 
-double Context::solve(const ast::Expression& expression) {
+double VirtualMachine::solve(const ast::Expression& expression) {
 	return apply_visitor(*this, expression);
 }
 
 
-double Context::operator ()(const ast::Operation& value) {
+double VirtualMachine::operator ()(const ast::Operation& value) {
 	double r = 0;
 	for(auto &&operand: value.operands){
 		r += apply_visitor(*this, operand);
@@ -62,7 +62,7 @@ double Context::operator ()(const ast::Operation& value) {
 	return r;
 }
 
-double Context::operator ()(const double& value) {
+double VirtualMachine::operator ()(const double& value) {
 	return value;
 }
 

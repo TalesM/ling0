@@ -5,8 +5,8 @@
  *      Author: Tales
  */
 
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
+#ifndef VIRTUALMACHINE_H_
+#define VIRTUALMACHINE_H_
 
 #include <iostream>
 #include <string>
@@ -21,10 +21,10 @@ struct Operation;
 /**
  * A context for executing commands
  */
-class Context {
+class VirtualMachine {
 public:
-	Context(std::ostream &out);
-	~Context();
+	VirtualMachine(std::ostream &out);
+	~VirtualMachine();
 
 	/**
 	 * Executes a piece of code.
@@ -59,4 +59,4 @@ private:
 
 } /* namespace ling0 */
 
-#endif /* CONTEXT_H_ */
+#endif /* VIRTUALMACHINE_H_ */
