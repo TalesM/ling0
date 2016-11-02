@@ -29,8 +29,10 @@ bool Parser::parseAll() {
 	auto first = tempBuffer.begin();
 	auto last = tempBuffer.end();
 	auto program_id = +(alnum | '_');
-	return phrase_parse(first, last, "program" >> program_id >> ':' >> "end" >> ';', space)
-			&& first == last;
+	auto string_cte = lexeme['"' >> *(char_ - '"') >> '"'];
+	auto command = "log" >> lit('(') >> string_cte >> ')' >> ';';
+	auto program = "program" >> program_id >> ':' >> *command >> "end" >> ';';
+	return phrase_parse(first, last, program, space) && first == last;
 }
 
 } /* namespace ling0 */

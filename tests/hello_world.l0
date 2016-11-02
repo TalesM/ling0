@@ -1,0 +1,3 @@
+program hello:
+	log("Hello World");
+end;
