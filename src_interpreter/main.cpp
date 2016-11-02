@@ -14,21 +14,33 @@ bool blank(const string &line);
 
 int main(int argc, char **argv) {
 	//TODO Boost...
+	int i;
+	string outputName = "";
 	if(argc <= 1){
-		cout << "No parameters given" << endl;
+		cerr << "No parameters given" << endl;
 		return EXIT_FAILURE;
 	}
-	if(argv[1] == "--version"s){
-		cout << "ling0 Version 0.1 Alpha" << endl;
-		return EXIT_SUCCESS;
+	for(i = 1; i < argc-1; ++i){
+		if(argv[i] == "--version"s){
+			cerr << "ling0 Version 0.1 Alpha" << endl;
+			return EXIT_SUCCESS;
+		}
+		if(argv[i][0] == '-'){
+			if(argv[i][1] == 'O'){
+				outputName = &argv[i][2];
+			}
+		}
 	}
-	fstream input(argv[1], ios_base::in);
-	if(!input.good()){
-		cout << "Invalid file" << endl;
+	fstream source(argv[i], ios_base::in);
+	if(!source.good()){
+		cerr << "Invalid file" << endl;
 		return EXIT_FAILURE;
+	}
+	if(outputName != ""){
+		fstream outputStream(outputName, ios_base::out);
 	}
 
-	Parser parser(input);
+	Parser parser(source);
 	if(!parser.parseAll()){
 		return EXIT_FAILURE;
 	}
