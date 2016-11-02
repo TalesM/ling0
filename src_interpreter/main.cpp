@@ -6,8 +6,9 @@
 #include <ostream>
 #include <string>
 
-#include "Parser.h"
 #include "ast/Program.h"
+#include "Parser.h"
+#include "VirtualMachine.h"
 
 using namespace std;
 using namespace ling0;
@@ -62,5 +63,6 @@ bool blank( string const&line){
 }
 
 void execute(ast::Program const &p, ostream &out){
-	out << p;
+	VirtualMachine vm(out);
+	vm.runProgram(p);
 }

@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <boost/spirit/home/x3.hpp>
+#include "ast/Program.h"
 
 namespace ling0 {
 
@@ -27,7 +28,14 @@ public:
 	~VirtualMachine();
 
 	/**
+	 * Executes a program
+	 * @param program
+	 */
+	void runProgram(const ast::Program &program);
+
+	/**
 	 * Executes a piece of code.
+	 * @deprecated
 	 * @param code
 	 * @return the result
 	 */

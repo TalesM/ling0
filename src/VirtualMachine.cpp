@@ -22,14 +22,6 @@ using namespace ast;
 using namespace std;
 using namespace boost;
 
-VirtualMachine::VirtualMachine(std::ostream &out) :
-		out(out) {
-
-}
-
-VirtualMachine::~VirtualMachine() {
-}
-
 template<typename ITERATOR>
 Expression parse_numbers(ITERATOR first, ITERATOR last) {
 	using namespace boost::spirit::x3;
@@ -39,6 +31,17 @@ Expression parse_numbers(ITERATOR first, ITERATOR last) {
 		throw std::runtime_error("<ERROR>");
 	}
 	return Expression{r};
+}
+
+VirtualMachine::VirtualMachine(std::ostream &out) :
+		out(out) {
+}
+
+VirtualMachine::~VirtualMachine() {
+}
+
+void VirtualMachine::runProgram(const ast::Program& program) {
+	out << program;
 }
 
 std::string VirtualMachine::exec(const std::string& code) {
@@ -67,3 +70,4 @@ double VirtualMachine::operator ()(const double& value) {
 }
 
 } /* namespace ling0 */
+
