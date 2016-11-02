@@ -46,7 +46,7 @@ sub modules. A parent sees all its submodules and can depend upon siblings, A su
 Modules can have kinds, some predefined and some are custom.
 
 ```ebnf
-Module              = ["module", qualified-id, ";"], declarations ;
+Module              = [("module"|"program"), qualified-id, ";"], declarations ;
 declarations        = {section, ":"}, commands ;
 section             = "public" | "private" ;
 commands            = command % ";", [";"] ;
