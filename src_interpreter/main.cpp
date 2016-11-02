@@ -3,14 +3,18 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <string>
 
 #include "Parser.h"
+#include "ast/Program.h"
 
 using namespace std;
 using namespace ling0;
 
-bool blank(const string &line);
+bool blank(string const &line);
+
+void execute(ast::Program const &p, ostream &out);
 
 int main(int argc, char **argv) {
 	//TODO Boost...
@@ -36,18 +40,27 @@ int main(int argc, char **argv) {
 		cerr << "Invalid file" << endl;
 		return EXIT_FAILURE;
 	}
-	if(outputName != ""){
-		fstream outputStream(outputName, ios_base::out);
-	}
+
 
 	Parser parser(source);
-	if(!parser.parseAll()){
+	auto result = parser.parseAll();
+	if(!result){
 		return EXIT_FAILURE;
+	}
+	if(outputName != ""){
+		fstream outputStream(outputName, ios_base::out);
+		execute(*result, outputStream);
+	} else {
+		execute(*result, cout);
+
 	}
 	return EXIT_SUCCESS;
 }
 
-bool blank(const string &line){
+bool blank( string const&line){
 	return all_of(line.begin(), line.end(), [](char c){return isblank(c);});
+}
 
+void execute(ast::Program const &p, ostream &out){
+	out << p;
 }

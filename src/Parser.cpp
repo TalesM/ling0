@@ -21,7 +21,7 @@ Parser::Parser(std::istream &in) :
 Parser::~Parser() {
 }
 
-bool Parser::parseAll() {
+boost::optional<ast::Program> Parser::parseAll() {
 	std::string tempBuffer(std::istreambuf_iterator<char>(in),
 			std::istreambuf_iterator<char> { });
 
@@ -30,9 +30,18 @@ bool Parser::parseAll() {
 	auto last = tempBuffer.end();
 	auto program_id = +(alnum | '_');
 	auto string_cte = lexeme['"' >> *(char_ - '"') >> '"'];
-	auto command = "log" >> lit('(') >> string_cte >> ')' >> ';';
-	auto program = "program" >> program_id >> ':' >> *command >> "end" >> ';';
-	return phrase_parse(first, last, program, space) && first == last;
+	auto wrapper = [](auto &ctx) {
+		_attr(ctx) += "\n";
+	};
+	auto command = "log" >> lit('(') >> string_cte[wrapper] >> ')' >> ';';
+	auto program = "program" >> omit[program_id] >> ':' >> *command >> "end" >> ';';
+
+	ast::Program p;
+	if (phrase_parse(first, last, program, space, p) && first == last) {
+		return p;
+	} else {
+		return {};
+	}
 }
 
 } /* namespace ling0 */

@@ -8,7 +8,9 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
+#include <boost/optional.hpp>
 #include <istream>
+#include "ast/Program.h"
 
 namespace ling0 {
 
@@ -24,7 +26,7 @@ public:
 	 * Parses everything
 	 * @return
 	 */
-	bool parseAll();
+	boost::optional<ast::Program> parseAll();
 private:
 	std::istream &in;
 };

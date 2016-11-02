@@ -17,7 +17,7 @@ namespace ast {
 /**
  * A program
  */
-using Program = std::vector<std::string>;
+using Program = std::string;
 
 }  // namespace ast
 }  // namespace ling0
