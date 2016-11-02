@@ -3,4 +3,5 @@ project(ling0)
 
 add_executable(ling0_prompt
 	main
+	Context
 )
