@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <cctype>
-#include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-#include "Context.h"
+#include "Parser.h"
 
 using namespace std;
 using namespace ling0;
@@ -16,20 +16,23 @@ int main(int argc, char **argv) {
 	//TODO Boost...
 	if(argc <= 1){
 		cout << "No parameters given" << endl;
-		return -1;
+		return EXIT_FAILURE;
 	}
 	if(argv[1] == "--version"s){
 		cout << "ling0 Version 0.1 Alpha" << endl;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	fstream input(argv[1], ios_base::in);
 	if(!input.good()){
 		cout << "Invalid file" << endl;
-		return 1;
+		return EXIT_FAILURE;
 	}
 
-	Context context(cout);
-	return 0;
+	Parser parser(input);
+	if(!parser.parseAll()){
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
 }
 
 bool blank(const string &line){
