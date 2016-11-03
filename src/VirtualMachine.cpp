@@ -47,16 +47,12 @@ double VirtualMachine::solve(const ast::Expression& expression) {
 	return apply_visitor(*this, expression);
 }
 
-double VirtualMachine::operator ()(const ast::Operation& value) {
-	double r = 0;
-	for (auto &&operand : value.operands) {
-		r += apply_visitor(*this, operand);
-	}
-	return r;
-}
-
 double VirtualMachine::operator ()(const double& value) {
 	return value;
+}
+
+double VirtualMachine::operator ()(const ast::AddExpression& value) {
+	return solve(value.left) + solve(value.right);
 }
 
 } /* namespace ling0 */

@@ -45,14 +45,14 @@ public:
 	 * @param value
 	 * @return
 	 */
-	double operator()(const ast::Operation &value);
+	double operator()(const double &value);
 
 	/**
-	 * Solve an expression
+	 * Solve an add expression
 	 * @param value
 	 * @return
 	 */
-	double operator()(const double &value);
+	double operator()(const ast::AddExpression &value);
 private:
 	std::ostream &out;
 };

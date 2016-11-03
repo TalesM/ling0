@@ -1,0 +1,5 @@
+program arithmetics:
+	log("{}", 2+2);
+	log("{}", -2+3);
+	log("{}", 4-2);
+end;

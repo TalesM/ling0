@@ -19,28 +19,31 @@ namespace ast {
 namespace x3 = boost::spirit::x3;
 
 // Forward
-struct Expression;
-
-struct Operation {
-	std::vector<Expression> operands;
-//	Operator opcode;
-};
+struct AddExpression;
 
 /**
- * Represents
+ * Represents an expression
  */
-struct Expression: x3::variant<double, Operation> {
+struct Expression: x3::variant<double, x3::forward_ast<AddExpression>> {
 	using base_type::base_type;
 	using base_type::operator=;
 };
 
+/**
+ * An Add Operation
+ */
+struct AddExpression {
+	Expression left;
+	Expression right;
+};
 
 } /* namespace ast */
 } /* namespace ling0 */
 
 BOOST_FUSION_ADAPT_STRUCT(
-		ling0::ast::Operation,
-		(std::vector<ling0::ast::Expression>, operands)
+		ling0::ast::AddExpression,
+		(ling0::ast::Expression, left),
+		(ling0::ast::Expression, right),
 );
 
 #endif /* AST_EXPRESSION_H_ */

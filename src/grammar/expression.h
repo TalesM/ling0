@@ -16,13 +16,13 @@ namespace grammar {
 
 using namespace boost::spirit::x3;
 
-rule<class operation, ast::Operation> operation = "operation";
-auto const operation_def = double_ % '+';
+rule<class add_operation, ast::AddExpression> add_operation = "add_expression";
+auto const add_operation_def = double_ >> '+' >> (add_operation | double_);
 
 rule<class expression, ast::Expression> expression = "expression";
-auto const expression_def = operation | double_;
+auto const expression_def = add_operation | double_;
 
-BOOST_SPIRIT_DEFINE(expression, operation);
+BOOST_SPIRIT_DEFINE(expression, add_operation);
 
 }
 }
