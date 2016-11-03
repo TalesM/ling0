@@ -12,11 +12,14 @@
 #include <vector>
 #include <boost/fusion/include/adapt_struct.hpp>
 
+#include "Expression.h"
+
 namespace ling0 {
 namespace ast {
 
 struct Log {
 	std::string content;
+	std::vector<Expression> parameters;
 };
 
 /**
@@ -33,6 +36,7 @@ struct Program{
 BOOST_FUSION_ADAPT_STRUCT(
 	ling0::ast::Log,
 	(std::string, content),
+    (std::vector<ling0::ast::Expression>, parameters)
 )
 BOOST_FUSION_ADAPT_STRUCT(
     ling0::ast::Program,

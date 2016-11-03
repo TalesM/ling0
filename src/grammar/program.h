@@ -10,6 +10,7 @@
 
 #include <boost/spirit/home/x3.hpp>
 #include "../ast/Program.h"
+#include "expression.h"
 
 namespace ling0 {
 namespace grammar {
@@ -23,7 +24,7 @@ rule<class string_cte, std::string> string_cte = "string_cte";
 auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
 
 rule<class command, ast::Log> command = "command";
-auto const command_def = "log" >> lit('(') >> string_cte >> ')' >> ';';
+auto const command_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')' >> ';';
 
 rule<class program, ast::Program> program = "program";
 auto const program_def = "program" >> program_id >> ':' >> *command >> "end" >> ';';

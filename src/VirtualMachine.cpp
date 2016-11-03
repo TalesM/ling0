@@ -30,8 +30,16 @@ VirtualMachine::~VirtualMachine() {
 }
 
 void VirtualMachine::runProgram(const ast::Program& program) {
-	for (auto const &stm : program.statements) {
-		out << stm.content << endl;
+	for (auto const &logStm : program.statements) {
+		string::size_type first = 0;
+		string::size_type last;
+		auto &content = logStm.content;
+		auto currentValue = logStm.parameters.begin();
+		while((last = content.find("{}", first)) != string::npos){
+			out << content.substr(first, last) << solve(*currentValue++);
+			first = last+2;
+		}
+		out << content.substr(first) << endl;
 	}
 }
 
