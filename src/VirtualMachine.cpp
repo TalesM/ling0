@@ -51,8 +51,14 @@ double VirtualMachine::operator ()(const double& value) {
 	return value;
 }
 
-double VirtualMachine::operator ()(const ast::AddExpression& value) {
-	return solve(value.left) + solve(value.right);
+double VirtualMachine::operator ()(const ast::BinExpression& value) {
+	switch (value.operation) {
+		case BinOperation::ADD:
+			return solve(value.left) + solve(value.right);
+		case BinOperation::SUB:
+			return solve(value.left) - solve(value.right);
+	}
+	throw std::runtime_error("Invalid Opcode");
 }
 
 } /* namespace ling0 */

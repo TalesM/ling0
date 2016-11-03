@@ -46,7 +46,8 @@ boost::optional<ast::Expression> Parser::parseExpression() {
 	ast::Expression r;
 	auto first = tempBuffer.begin();
 	auto last = tempBuffer.end();
-	if (phrase_parse(first, last, grammar::expression, space, r)) {
+	if (phrase_parse(first, last, grammar::expression, space, r)
+			&& first == last) {
 		return r;
 	} else {
 		return {};

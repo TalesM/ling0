@@ -52,7 +52,7 @@ public:
 	 * @param value
 	 * @return
 	 */
-	double operator()(const ast::AddExpression &value);
+	double operator()(const ast::BinExpression &value);
 private:
 	std::ostream &out;
 };
