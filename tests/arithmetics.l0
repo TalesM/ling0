@@ -7,4 +7,5 @@ program arithmetics:
 	log("{}", 8/2);
 	log("{}", 11%4);
 	log("{}", 7-2*5);
+	log("{}", (7-2)*5);
 end;

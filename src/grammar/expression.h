@@ -70,25 +70,27 @@ struct binaryOperatorWrapper {
 };
 
 rule<class constant, ast::Expression> constant = "constant";
-auto const constant_def = double_;
-
+rule<class unary, ast::Expression> unary = "unary";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
-auto const mul_expression_def = (constant >> *(multiplicativeSymbols >> constant))[binaryOperatorWrapper { }];
+rule<class add_expression, ast::Expression> add_expression = "add_expression";
+rule<class expression, ast::Expression> expression = "expression";
+
+auto const constant_def = double_;
+auto const unary_def = constant | ('(' >> expression >> ')');
+auto const mul_expression_def = (unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
 
 /**
  * Parses additive expressions (with + and -)
  */
-rule<class add_expression, ast::Expression> add_expression = "add_expression";
 auto const add_expression_def =
 		(mul_expression >> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
 
 /**
  * Parses expressions
  */
-rule<class expression, ast::Expression> expression = "expression";
 auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, constant)
+BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, constant)
 
 }
 }
