@@ -34,14 +34,6 @@ public:
 	void runProgram(const ast::Program &program);
 
 	/**
-	 * Executes a piece of code.
-	 * @deprecated
-	 * @param code
-	 * @return the result
-	 */
-	std::string exec(const std::string &code);
-
-	/**
 	 * Solve an expression
 	 * @param expression
 	 * @return

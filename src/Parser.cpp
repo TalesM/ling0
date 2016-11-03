@@ -11,7 +11,11 @@
 #include <iterator>
 #include <vector>
 
+#include "grammar/program.h"
+#include "grammar/expression.h"
+
 namespace ling0 {
+using namespace boost::spirit::x3;
 
 Parser::Parser(std::istream &in) :
 		in(in) {
@@ -25,20 +29,25 @@ boost::optional<ast::Program> Parser::parseAll() {
 	std::string tempBuffer(std::istreambuf_iterator<char>(in),
 			std::istreambuf_iterator<char> { });
 
-	using namespace boost::spirit::x3;
 	auto first = tempBuffer.begin();
 	auto last = tempBuffer.end();
-	auto program_id = +(alnum | '_');
-	auto string_cte = lexeme['"' >> *(char_ - '"') >> '"'];
-	auto wrapper = [](auto &ctx) {
-		_attr(ctx) += "\n";
-	};
-	auto command = "log" >> lit('(') >> string_cte[wrapper] >> ')' >> ';';
-	auto program = "program" >> omit[program_id] >> ':' >> *command >> "end" >> ';';
-
 	ast::Program p;
-	if (phrase_parse(first, last, program, space, p) && first == last) {
+	if (phrase_parse(first, last, grammar::program, space, p)
+			&& first == last) {
 		return p;
+	} else {
+		return {};
+	}
+}
+
+boost::optional<ast::Expression> Parser::parseExpression() {
+	std::string tempBuffer(std::istreambuf_iterator<char>(in),
+			std::istreambuf_iterator<char> { });
+	ast::Expression r;
+	auto first = tempBuffer.begin();
+	auto last = tempBuffer.end();
+	if (phrase_parse(first, last, grammar::expression, space, r)) {
+		return r;
 	} else {
 		return {};
 	}

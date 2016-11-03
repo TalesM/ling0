@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include <Parser.h>
 #include <VirtualMachine.h>
 
 using namespace std;
@@ -21,7 +22,14 @@ int main() {
 		if (line == "exit") {
 			break;
 		} else if(!blank(line)) {
-			cout << context.exec(line) << endl;
+			stringstream inputstream(line);
+			Parser parser(inputstream);
+			auto e = parser.parseExpression();
+			if(e){
+				cout << context.solve(*e) << endl;
+			} else {
+				cerr << "Error" << endl;
+			}
 		}
 	};
 	cout << "Exited Successfully" << endl;

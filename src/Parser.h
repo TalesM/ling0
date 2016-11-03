@@ -11,6 +11,7 @@
 #include <boost/optional.hpp>
 #include <istream>
 #include "ast/Program.h"
+#include "ast/Expression.h"
 
 namespace ling0 {
 
@@ -27,6 +28,12 @@ public:
 	 * @return
 	 */
 	boost::optional<ast::Program> parseAll();
+
+	/**
+	 * Parse an expression
+	 * @return
+	 */
+	boost::optional<ast::Expression> parseExpression();
 private:
 	std::istream &in;
 };
