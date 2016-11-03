@@ -22,7 +22,7 @@ struct Operation;
 /**
  * A context for executing commands
  */
-class VirtualMachine {
+class VirtualMachine: public boost::static_visitor<double> /*TODO Remove this*/ {
 public:
 	VirtualMachine(std::ostream &out);
 	~VirtualMachine();
