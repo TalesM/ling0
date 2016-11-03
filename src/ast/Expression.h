@@ -32,6 +32,9 @@ struct Expression: x3::variant<double, x3::forward_ast<BinExpression>> {
 enum BinOperation : uint32_t {
 	ADD = '+',
 	SUB = '-',
+	MUL = '*',
+	DIV = '/',
+	MOD = '%',
 };
 
 /**
@@ -51,6 +54,6 @@ BOOST_FUSION_ADAPT_STRUCT(
 		(ling0::ast::Expression, left),
 		(ling0::ast::BinOperation, operation),
 		(ling0::ast::Expression, right),
-);
+)
 
 #endif /* AST_EXPRESSION_H_ */

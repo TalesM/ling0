@@ -7,13 +7,10 @@
 
 #include "VirtualMachine.h"
 
-#include <boost/spirit/home/x3/char/char_class.hpp>
-#include <boost/spirit/home/x3/numeric/real.hpp>
-#include <boost/spirit/home/x3/operator/list.hpp>
-#include <boost/variant/detail/apply_visitor_binary.hpp>
-#include <boost/variant/detail/apply_visitor_delayed.hpp>
-#include <boost/variant/detail/apply_visitor_unary.hpp>
+#include <cmath>
+#include <iterator>
 #include <stdexcept>
+#include <vector>
 
 #include "ast/Expression.h"
 
@@ -57,6 +54,12 @@ double VirtualMachine::operator ()(const ast::BinExpression& value) {
 			return solve(value.left) + solve(value.right);
 		case BinOperation::SUB:
 			return solve(value.left) - solve(value.right);
+		case BinOperation::MUL:
+			return solve(value.left) * solve(value.right);
+		case BinOperation::DIV:
+			return solve(value.left) / solve(value.right);
+		case BinOperation::MOD:
+			return fmod(solve(value.left), solve(value.right));
 	}
 	throw std::runtime_error("Invalid Opcode");
 }

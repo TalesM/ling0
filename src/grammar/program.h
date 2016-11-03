@@ -28,7 +28,7 @@ auto const command_def = "log" >> lit('(') >> string_cte >> *(',' >> expression)
 
 rule<class program, ast::Program> program = "program";
 auto const program_def = "program" >> program_id >> ':' >> *command >> "end" >> ';';
-BOOST_SPIRIT_DEFINE(program, command, string_cte);
+BOOST_SPIRIT_DEFINE(program, command, string_cte)
 
 }  // namespace grammar
 

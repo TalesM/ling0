@@ -36,6 +36,19 @@ struct additiveSymbols_: symbols<ast::BinOperation> {
 } const additiveSymbols;
 
 /**
+ * Multiplicative symbols
+ */
+struct multiplicativeSymbols_: symbols<ast::BinOperation> {
+	multiplicativeSymbols_() {
+		using ast::BinOperation;
+		add
+			("*", BinOperation::MUL)
+			("/", BinOperation::DIV)
+			("%", BinOperation::MOD);
+	}
+} const multiplicativeSymbols;
+
+/**
  * Wraps binary operators sequences into the correct BinOperator tree hierarchy
  *
  * It is necessary to allow right to left priority.
@@ -47,30 +60,35 @@ struct binaryOperatorWrapper {
 		using namespace ast;
 
 		auto const & attr = _attr(ctx);
-		auto head = Expression(at_c<0>(attr));
-		auto tail = at_c<1>(attr);
-		for (auto &&tailPiece : tail) {
-			head = BinExpression { head, at_c<0>(tailPiece),
-					Expression(at_c<1>(tailPiece)) };
+		auto result = at_c<0>(attr);
+		for (auto &&tailPiece : at_c<1>(attr)) {
+			result = BinExpression { result, at_c<0>(tailPiece), at_c<1>(
+					tailPiece) };
 		}
-		_val(ctx) = head;
+		_val(ctx) = result;
 	}
 };
+
+rule<class constant, ast::Expression> constant = "constant";
+auto const constant_def = double_;
+
+rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
+auto const mul_expression_def = (constant >> *(multiplicativeSymbols >> constant))[binaryOperatorWrapper { }];
 
 /**
  * Parses additive expressions (with + and -)
  */
-rule<class add_operation, ast::Expression> add_operation = "add_expression";
-auto const add_operation_def =
-		(double_ >> *(additiveSymbols >> double_))[binaryOperatorWrapper { }];
+rule<class add_expression, ast::Expression> add_expression = "add_expression";
+auto const add_expression_def =
+		(mul_expression >> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
 
 /**
  * Parses expressions
  */
 rule<class expression, ast::Expression> expression = "expression";
-auto const expression_def = add_operation | double_;
+auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_operation);
+BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, constant)
 
 }
 }
