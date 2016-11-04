@@ -1,4 +1,4 @@
-Ling0.md
+Ling0 {#mainpage}
 ========
 
 A small language experiment. We want to be able make a language with semantics close to C, C++,
@@ -45,45 +45,50 @@ sub modules. A parent sees all its submodules and can depend upon siblings, A su
 
 Modules can have kinds, some predefined and some are custom.
 
-```ebnf
-Module              = [("module"|"program"), qualified-id, ";"], declarations ;
-declarations        = {section, ":"}, commands ;
-section             = "public" | "private" ;
-commands            = command % ";", [";"] ;
-commands            = binding
-                    | import
-                    | function definition
-                    | type definition
-                    | return
-                    | expression
-binding             = "let", ["mutable"], id, binding init;
-binding init        = ":", type declaration ["=", expression] | "=", expression;
-import              = "import", qualified-id, ["as", id];
-function definition = "def", id, [function signature], "{", commands, "}" ;
-function signature  = "(", (id, ":", type declaration) % ",", ")", [":", type declaration] ;
-type definition     = struct definition | union definition | impl definition | trait definition | trait specialization;
-struct definition   = "struct", id, composed definition;
-union definition    = "union", id, composed definition;
-composed definition = "{", (id, ":", type declaration % ","), [","] "}";
-impl definition     = "impl", id, "{", {method definition % ","}, "}",
+Syntax
+------
 
-expression          = {lhs, "="}, rhs;
-rhs                 = logical expression | "if", logical expression, "then", rhs, "else", rhs;
-lhs                 = qualified-id;
-logical expression  = comp expression % ("and" | "or");
-comp expression     = infix expression % ("=="| "!="| "<"| ">"| "<="| ">=");
-infix expression    = sum expression, [infix-op, ((sum expression | call) % infix-op)];
-infix-op            = "|", id, "|";
-sum expression      = mul expression % ("+" | "-");
-mul expression      = prefix expression % ("*" | "/" | "%");
-prefix expression   = {"not" | "-"}, posfix expression;
-posfix expression   = leaf expression, {call | dot expression}
-leaf expression     = id | "(", expression, ")" | numeric constant | string constant | sequence constant | associative constant;
-sequence constant   = "[", (expression % ","), "]";
-associative constant= "{", ([(id | "(", expression, ")"), "="], expression), "}";
+<table class="ebnf" border=1>
+<caption>Ebnf-like</caption>
+<tr><th>Rule                </th><th> Definition </th></tr> 
+<tr><td>Module              <td> [("module"|"program"), qualified-id, ";"], declarations ; 
+<tr><td>declarations        <td> {section, ":"}, commands ;
+<tr><td>section             <td> "public" | "private" ;
+<tr><td>commands            <td> command % ";", [";"] ;
+<tr><td>command             <td> binding
+                            <br/> | import
+                            <br/> | function definition
+                            <br/> | type definition
+                            <br/> | return
+                            <br/> | expression
+<tr><td>binding             <td> "let", ["mutable"], id, binding init;
+<tr><td>binding init        <td> ":", type declaration ["=", expression] | "=", expression;
+<tr><td>import              <td> "import", qualified-id, ["as", id];
+<tr><td>function definition <td> "def", id, [function signature], "{", commands, "}" ;
+<tr><td>function signature  <td> "(", (id, ":", type declaration) % ",", ")", [":", type declaration] ;
+<tr><td>type definition     <td> struct definition | union definition | impl definition | trait definition | trait specialization;
+<tr><td>struct definition   <td> "struct", id, composed definition;
+<tr><td>union definition    <td> "union", id, composed definition;
+<tr><td>composed definition <td> "{", (id, ":", type declaration % ","), [","] "}";
+<tr><td>impl definition     <td> "impl", id, "{", {method definition % ","}, "}",
+<tr><td>expression          <td> {lhs, "="}, rhs;
+<tr><td>rhs                 <td> logical expression | "if", logical expression, "then", rhs, "else", rhs;
+<tr><td>lhs                 <td> qualified-id;
+<tr><td>logical expression  <td> comp expression % ("and" | "or");
+<tr><td>comp expression     <td> infix expression % ("=="| "!="| "<"| ">"| "<="| ">=");
+<tr><td>infix expression    <td> sum expression, [infix-op, ((sum expression | call) % infix-op)];
+<tr><td>infix-op            <td> "|", id, "|";
+<tr><td>sum expression      <td> mul expression % ("+" | "-");
+<tr><td>mul expression      <td> prefix expression % ("*" | "/" | "%");
+<tr><td>prefix expression   <td> {"not" | "-"}, posfix expression;
+<tr><td>posfix expression   <td> leaf expression, {call | dot expression}
+<tr><td>leaf expression     <td> id | "(", expression, ")" | numeric constant | string constant | sequence constant | associative constant;
+<tr><td>sequence constant   <td> "[", (expression % ","), "]";
+<tr><td>associative constant<td> "{", ([(id | "(", expression, ")"), "="], expression), "}";
+<!-- -->
+<tr><td>qualified-id        <td> id, {dot expression};
+<tr><td>dot expression      <td> ".", id;
+<!-- -->
+<tr><td>type declaration    <td> id, [ "<", (type declaration | numeric constant | string constant % ",") , ">"]
+</table>
 
-qualified-id        = id, {dot expression};
-dot expression      = ".", id;
-
-type declaration    = id, [ "<", (type declaration | numeric constant | string constant % ",") , ">"]
-```
