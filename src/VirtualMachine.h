@@ -54,6 +54,8 @@ public:
 	 */
 	double operator()(const ast::BinExpression &value);
 private:
+	void logStm(ast::Log const &logStm);
+private:
 	std::ostream &out;
 };
 

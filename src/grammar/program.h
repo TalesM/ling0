@@ -23,12 +23,18 @@ auto const program_id = +(alnum | '_');
 rule<class string_cte, std::string> string_cte = "string_cte";
 auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
 
-rule<class command, ast::Log> command = "command";
-auto const command_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')' >> ';';
+rule<class log, ast::Log> log = "log";
+auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')';
+
+rule<class binding, ast::Binding> binding = "binding";
+auto const binding_def = "let" >> omit[program_id] >> -("=" >> expression);
+
+rule<class statement, ast::Statement> statement = "statement";
+auto const statement_def = (log | binding) >> ';';
 
 rule<class program, ast::Program> program = "program";
-auto const program_def = "program" >> program_id >> ':' >> *command >> "end" >> ';';
-BOOST_SPIRIT_DEFINE(program, command, string_cte)
+auto const program_def = "program" >> program_id >> ':' >> *statement >> "end" >> ';';
+BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte)
 
 }  // namespace grammar
 

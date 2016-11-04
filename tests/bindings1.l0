@@ -1,0 +1,3 @@
+program bindings1:
+	let a = 5;
+end;
