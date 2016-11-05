@@ -24,7 +24,7 @@ struct bindingWrapper {
 		using namespace ast;
 		auto const & attr = _attr(ctx);
 		bindingId.push(at_c<0>(attr));
-		_val(ctx) = Binding{at_c<1>(attr)};
+		_val(ctx) = BindingStatement{at_c<1>(attr)};
 	}
 };
 
@@ -32,10 +32,10 @@ struct bindingWrapper {
 rule<class string_cte, std::string> string_cte = "string_cte";
 auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
 
-rule<class log, ast::Log> log = "log";
+rule<class log, ast::LogStatement> log = "log";
 auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')';
 
-rule<class binding, ast::Binding> binding = "binding";
+rule<class binding, ast::BindingStatement> binding = "binding";
 auto const binding_def = ("let" >> identifier >> -("=" >> expression))[bindingWrapper{}];
 
 rule<class statement, ast::Statement> statement = "statement";

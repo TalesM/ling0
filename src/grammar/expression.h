@@ -88,7 +88,7 @@ struct binaryOperatorWrapper {
 
 rule<class constant, std::string> identifier = "identifier";
 rule<class constant, ast::Expression> constant = "constant";
-rule<class access, ast::Access> access = "access";
+rule<class access, ast::BindingAccess> access = "access";
 rule<class unary, ast::Expression> unary = "unary";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";

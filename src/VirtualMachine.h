@@ -11,15 +11,18 @@
 #include <iostream>
 #include <string>
 #include <boost/spirit/home/x3.hpp>
-#include "ast/Program.h"
 
 namespace ling0 {
 
 using Value = double;
 
 namespace ast {
+struct BindingAccess;
+struct BinExpression;
 struct Expression;
+struct LogStatement;
 struct Operation;
+struct Program;
 }
 /**
  * A context for executing commands
@@ -61,9 +64,9 @@ public:
 	 * @param value
 	 * @return
 	 */
-	Value operator()(const ast::Access &value);
+	Value operator()(const ast::BindingAccess &value);
 private:
-	void logStm(ast::Log const &logStm);
+	void logStm(ast::LogStatement const &logStm);
 	void pushLocal(ast::Expression const &initializer);
 private:
 	std::ostream &out;

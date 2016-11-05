@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "ast/Expression.h"
+#include "ast/Program.h"
 
 namespace ling0 {
 using namespace ast;
@@ -31,11 +31,11 @@ void VirtualMachine::runProgram(const ast::Program& program) {
 		struct _ : boost::static_visitor<void>{
 			VirtualMachine &vm;
 			_(VirtualMachine &vm): vm(vm){}
-			void operator()(const ast::Log &logStm){
+			void operator()(const ast::LogStatement &logStm){
 				vm.logStm(logStm);
 			}
 
-			void operator()(const ast::Binding &binding){
+			void operator()(const ast::BindingStatement &binding){
 				if(binding.initializer){
 					vm.pushLocal(binding.initializer.value_or(Expression{}));
 				}
@@ -70,12 +70,12 @@ Value VirtualMachine::operator ()(const ast::BinExpression& value) {
 	throw std::runtime_error("Invalid Opcode");
 }
 
-Value VirtualMachine::operator ()(const ast::Access& value) {
+Value VirtualMachine::operator ()(const ast::BindingAccess& value) {
 	assert(value.id < memory.size());
 	return memory[value.id];
 }
 
-void VirtualMachine::logStm(const ast::Log& logStm) {
+void VirtualMachine::logStm(const ast::LogStatement& logStm) {
 	string::size_type first = 0;
 	string::size_type last;
 	auto &content = logStm.content;

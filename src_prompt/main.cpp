@@ -4,8 +4,9 @@
 #include <iostream>
 #include <string>
 
-#include <Parser.h>
-#include <VirtualMachine.h>
+#include "ast/Program.h"
+#include "Parser.h"
+#include "VirtualMachine.h"
 
 using namespace std;
 using namespace ling0;

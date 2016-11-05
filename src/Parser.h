@@ -10,10 +10,13 @@
 
 #include <boost/optional.hpp>
 #include <istream>
-#include "ast/Program.h"
-#include "ast/Expression.h"
 
 namespace ling0 {
+//Forward declarations
+namespace ast {
+struct Expression;
+struct Program;
+}
 
 /**
  * Parses a character representation of the program and mounts the AST
