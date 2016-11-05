@@ -11,7 +11,7 @@
 #include <iterator>
 #include <vector>
 
-#include "grammar/program.h"
+#include "grammar.h"
 
 namespace ling0 {
 using namespace boost::spirit::x3;
@@ -31,7 +31,7 @@ boost::optional<ast::Program> Parser::parseAll() {
 	auto first = tempBuffer.begin();
 	auto last = tempBuffer.end();
 	ast::Program p;
-	if (phrase_parse(first, last, grammar::program, space, p)
+	if (phrase_parse(first, last, program, space, p)
 			&& first == last) {
 		return p;
 	} else {
@@ -45,7 +45,7 @@ boost::optional<ast::Expression> Parser::parseExpression() {
 	ast::Expression r;
 	auto first = tempBuffer.begin();
 	auto last = tempBuffer.end();
-	if (phrase_parse(first, last, grammar::expression, space, r)
+	if (phrase_parse(first, last, expression, space, r)
 			&& first == last) {
 		return r;
 	} else {

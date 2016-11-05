@@ -1,28 +1,20 @@
 /*
- * expression.h
+ * program.h
  *
  *  Created on: 2 de nov de 2016
  *      Author: talesm
  */
 
-#ifndef GRAMMAR_EXPRESSION_H_
-#define GRAMMAR_EXPRESSION_H_
+#ifndef GRAMMAR_H_
+#define GRAMMAR_H_
 
-#include <boost/spirit/home/x3/core/action.hpp>
-#include <boost/spirit/home/x3/nonterminal/rule.hpp>
-#include <boost/spirit/home/x3/numeric/real.hpp>
-#include <boost/spirit/home/x3/operator/alternative.hpp>
-#include <boost/spirit/home/x3/operator/kleene.hpp>
-#include <boost/spirit/home/x3/operator/sequence.hpp>
-#include <boost/spirit/home/x3/string/symbols.hpp>
-
-#include "../ast/Expression.h"
+#include <boost/spirit/home/x3.hpp>
+#include "ast/Program.h"
 
 namespace ling0 {
-namespace grammar {
+namespace {
 
 using namespace boost::spirit::x3;
-
 /**
  * Checks for additive priority level symbols
  */
@@ -86,6 +78,17 @@ struct binaryOperatorWrapper {
 	}
 };
 
+struct bindingWrapper {
+	template<typename Context>
+	void operator()(Context const &ctx) {
+		using namespace boost::fusion;
+		using namespace ast;
+		auto const & attr = _attr(ctx);
+		bindingId.push(at_c<0>(attr));
+		_val(ctx) = BindingStatement { at_c<1>(attr) };
+	}
+};
+
 rule<class constant, std::string> identifier = "identifier";
 rule<class constant, ast::Expression> constant = "constant";
 rule<class access, ast::BindingAccess> access = "access";
@@ -93,27 +96,38 @@ rule<class unary, ast::Expression> unary = "unary";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
 rule<class expression, ast::Expression> expression = "expression";
+rule<class string_cte, std::string> string_cte = "string_cte";
+rule<class log, ast::LogStatement> log = "log";
+rule<class binding, ast::BindingStatement> binding = "binding";
+rule<class statement, ast::Statement> statement = "statement";
+rule<class program, ast::Program> program = "program";
 
 auto const identifier_def = +(alnum | '_');
 auto const constant_def = double_;
 auto const access_def = bindingId;
 auto const unary_def = constant | access | ('(' >> expression >> ')');
-auto const mul_expression_def = (unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
 
-/**
- * Parses additive expressions (with + and -)
- */
-auto const add_expression_def =
-		(mul_expression >> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
-
-/**
- * Parses expressions
- */
+auto const mul_expression_def =
+		(unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
+auto const add_expression_def = (mul_expression
+		>> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
 auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant, identifier)
+auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
+auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression)
+		>> ')';
+auto const binding_def =
+		("let" >> identifier >> -("=" >> expression))[bindingWrapper { }];
+auto const statement_def = (log | binding) >> ';';
 
-}
-}
+auto const program_def = "program" >> identifier >> ':' >> *statement >> "end"
+		>> ';';
 
-#endif /* GRAMMAR_EXPRESSION_H_ */
+BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte, expression,
+		add_expression, mul_expression, unary, access, constant, identifier)
+
+}  // namespace grammar
+
+}  // namespace ling0
+
+#endif /* GRAMMAR_H_ */
