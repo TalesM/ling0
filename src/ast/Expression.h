@@ -22,7 +22,7 @@ namespace x3 = boost::spirit::x3;
 struct BinExpression;
 
 struct Access{
-	int id;
+	unsigned id;
 };
 
 /**

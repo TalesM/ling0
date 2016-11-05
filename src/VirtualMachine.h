@@ -15,6 +15,8 @@
 
 namespace ling0 {
 
+using Value = double;
+
 namespace ast {
 struct Expression;
 struct Operation;
@@ -22,7 +24,7 @@ struct Operation;
 /**
  * A context for executing commands
  */
-class VirtualMachine: public boost::static_visitor<double> /*TODO Remove this*/ {
+class VirtualMachine: public boost::static_visitor<Value> /*TODO Remove this*/ {
 public:
 	VirtualMachine(std::ostream &out);
 	~VirtualMachine();
@@ -38,32 +40,34 @@ public:
 	 * @param expression
 	 * @return
 	 */
-	double solve(const ast::Expression &expression);
+	Value solve(const ast::Expression &expression);
 
 	/**
 	 * Solve an expression
 	 * @param value
 	 * @return
 	 */
-	double operator()(const double &value);
+	Value operator()(const double &value);
 
 	/**
 	 * Solve an add expression
 	 * @param value
 	 * @return
 	 */
-	double operator()(const ast::BinExpression &value);
+	Value operator()(const ast::BinExpression &value);
 
 	/**
 	 *
 	 * @param value
 	 * @return
 	 */
-	double operator()(const ast::Access &value);
+	Value operator()(const ast::Access &value);
 private:
 	void logStm(ast::Log const &logStm);
+	void pushLocal(ast::Expression const &initializer);
 private:
 	std::ostream &out;
+	std::vector<Value> memory;
 };
 
 } /* namespace ling0 */

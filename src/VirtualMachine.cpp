@@ -36,7 +36,9 @@ void VirtualMachine::runProgram(const ast::Program& program) {
 			}
 
 			void operator()(const ast::Binding &binding){
-				//TODO
+				if(binding.initializer){
+					vm.pushLocal(binding.initializer.value_or(Expression{}));
+				}
 			}
 
 		} visitor(*this);
@@ -44,15 +46,15 @@ void VirtualMachine::runProgram(const ast::Program& program) {
 	}
 }
 
-double VirtualMachine::solve(const ast::Expression& expression) {
+Value VirtualMachine::solve(const ast::Expression& expression) {
 	return apply_visitor(*this, expression);
 }
 
-double VirtualMachine::operator ()(const double& value) {
+Value VirtualMachine::operator ()(const double& value) {
 	return value;
 }
 
-double VirtualMachine::operator ()(const ast::BinExpression& value) {
+Value VirtualMachine::operator ()(const ast::BinExpression& value) {
 	switch (value.operation) {
 		case BinOperation::ADD:
 			return solve(value.left) + solve(value.right);
@@ -68,8 +70,9 @@ double VirtualMachine::operator ()(const ast::BinExpression& value) {
 	throw std::runtime_error("Invalid Opcode");
 }
 
-double VirtualMachine::operator ()(const ast::Access& value) {
-	return 0;
+Value VirtualMachine::operator ()(const ast::Access& value) {
+	assert(value.id < memory.size());
+	return memory[value.id];
 }
 
 void VirtualMachine::logStm(const ast::Log& logStm) {
@@ -82,6 +85,10 @@ void VirtualMachine::logStm(const ast::Log& logStm) {
 		first = last + 2;
 	}
 	out << content.substr(first) << endl;
+}
+
+void VirtualMachine::pushLocal(const ast::Expression& initializer) {
+	memory.push_back(solve(initializer));
 }
 
 } /* namespace ling0 */
