@@ -19,6 +19,26 @@ using namespace ast;
 using namespace std;
 using namespace boost;
 
+static thread_local VirtualMachine *vm = nullptr;
+
+template<typename RETURN>
+struct AstVisitor: public boost::static_visitor<RETURN> {
+	using base = AstVisitor<RETURN>;
+};
+
+struct VmGuard{
+	VmGuard(VirtualMachine *current){
+		old = vm;
+		vm = current;
+	}
+
+	~VmGuard(){
+		vm = old;
+	}
+
+	VirtualMachine *old;
+};
+
 VirtualMachine::VirtualMachine(std::ostream &out) :
 		out(out) {
 }
@@ -27,77 +47,73 @@ VirtualMachine::~VirtualMachine() {
 }
 
 void VirtualMachine::runProgram(const ast::Program& program) {
+	VmGuard guard(this);
+	struct _ : AstVisitor<void>{
+		void operator()(const ast::LogStatement &logStm){
+			string::size_type first = 0;
+			string::size_type last;
+			auto &content = logStm.content;
+			auto currentValue = logStm.parameters.begin();
+			while ((last = content.find("{}", first)) != string::npos) {
+				vm->out << content.substr(first, last) << vm->rawSolve(*currentValue++);
+				first = last + 2;
+			}
+			vm->out << content.substr(first) << endl;
+		}
+
+		void operator()(const ast::BindingStatement &binding){
+			vm->pushLocal(binding.initializer.value_or(Expression{}));
+		}
+
+	} visitor;
 	for (auto const &logStm : program.statements) {
-		struct _ : boost::static_visitor<void>{
-			VirtualMachine &vm;
-			_(VirtualMachine &vm): vm(vm){}
-			void operator()(const ast::LogStatement &logStm){
-				vm.logStm(logStm);
-			}
-
-			void operator()(const ast::BindingStatement &binding){
-				if(binding.initializer){
-					vm.pushLocal(binding.initializer.value_or(Expression{}));
-				}
-			}
-
-		} visitor(*this);
 		logStm.apply_visitor(visitor);
 	}
 }
 
 Value VirtualMachine::solve(const ast::Expression& expression) {
-	return apply_visitor(*this, expression);
+	VmGuard guard(this);
+	return rawSolve(expression);
 }
 
-Value VirtualMachine::operator ()(const double& value) {
-	return value;
-}
-
-Value VirtualMachine::operator ()(const ast::BinExpression& value) {
-	switch (value.operation) {
-		case BinOperation::ADD:
-			return solve(value.left) + solve(value.right);
-		case BinOperation::SUB:
-			return solve(value.left) - solve(value.right);
-		case BinOperation::MUL:
-			return solve(value.left) * solve(value.right);
-		case BinOperation::DIV:
-			return solve(value.left) / solve(value.right);
-		case BinOperation::MOD:
-			return fmod(solve(value.left), solve(value.right));
-	}
-	throw std::runtime_error("Invalid Opcode");
-}
-
-Value VirtualMachine::operator ()(const ast::BindingAccess& value) {
-	assert(value.id < memory.size());
-	return memory[value.id];
-}
-
-void VirtualMachine::logStm(const ast::LogStatement& logStm) {
-	string::size_type first = 0;
-	string::size_type last;
-	auto &content = logStm.content;
-	auto currentValue = logStm.parameters.begin();
-	while ((last = content.find("{}", first)) != string::npos) {
-		out << content.substr(first, last) << solve(*currentValue++);
-		first = last + 2;
-	}
-	out << content.substr(first) << endl;
-}
-
-Value VirtualMachine::operator ()(ast::IfExpression const &value) {
-	auto condition = solve(value.condition);
-	if(condition){
-		return solve(value.thenBranch);
-	} else {
-		return solve(value.elseBranch);
-	}
+Value VirtualMachine::rawSolve(const ast::Expression& expression) {
+	struct _: AstVisitor<Value> {
+		Value operator()(const double &value) {
+			return value;
+		}
+		Value operator()(const ast::BinExpression &value) {
+			switch (value.operation) {
+			case BinOperation::ADD:
+				return vm->rawSolve(value.left) + vm->rawSolve(value.right);
+			case BinOperation::SUB:
+				return vm->rawSolve(value.left) - vm->rawSolve(value.right);
+			case BinOperation::MUL:
+				return vm->rawSolve(value.left) * vm->rawSolve(value.right);
+			case BinOperation::DIV:
+				return vm->rawSolve(value.left) / vm->rawSolve(value.right);
+			case BinOperation::MOD:
+				return fmod(vm->rawSolve(value.left), vm->rawSolve(value.right));
+			}
+			throw std::runtime_error("Invalid Opcode");
+		}
+		Value operator()(const ast::BindingAccess &value){
+			assert(value.id < vm->memory.size());
+			return vm->memory[value.id];
+		}
+		Value operator()(ast::IfExpression const &value){
+			auto condition = vm->rawSolve(value.condition);
+			if(condition){
+				return vm->rawSolve(value.thenBranch);
+			} else {
+				return vm->rawSolve(value.elseBranch);
+			}
+		}
+	} visitor;
+	return apply_visitor(visitor, expression);
 }
 
 void VirtualMachine::pushLocal(const ast::Expression& initializer) {
-	memory.push_back(solve(initializer));
+	memory.push_back(rawSolve(initializer));
 }
 
 } /* namespace ling0 */

@@ -17,18 +17,13 @@ namespace ling0 {
 using Value = double;
 
 namespace ast {
-struct BindingAccess;
-struct BinExpression;
 struct Expression;
-struct IfExpression;
-struct LogStatement;
-struct Operation;
 struct Program;
 }
 /**
  * A context for executing commands
  */
-class VirtualMachine: public boost::static_visitor<Value> /*TODO Remove this*/ {
+class VirtualMachine {
 public:
 	VirtualMachine(std::ostream &out);
 	~VirtualMachine();
@@ -42,33 +37,11 @@ public:
 	/**
 	 * Solve an expression
 	 * @param expression
-	 * @return
+	 * @return The Value
 	 */
 	Value solve(const ast::Expression &expression);
-
-	/**
-	 * Solve an expression
-	 * @param value
-	 * @return
-	 */
-	Value operator()(const double &value);
-
-	/**
-	 * Solve an add expression
-	 * @param value
-	 * @return
-	 */
-	Value operator()(const ast::BinExpression &value);
-
-	/**
-	 *
-	 * @param value
-	 * @return
-	 */
-	Value operator()(const ast::BindingAccess &value);
-	Value operator()(ast::IfExpression const &value);
 private:
-	void logStm(ast::LogStatement const &logStm);
+	Value rawSolve(const ast::Expression &expression);
 	void pushLocal(ast::Expression const &initializer);
 private:
 	std::ostream &out;
