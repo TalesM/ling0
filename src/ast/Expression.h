@@ -21,10 +21,14 @@ namespace x3 = boost::spirit::x3;
 // Forward
 struct BinExpression;
 
+struct Access{
+	int id;
+};
+
 /**
  * Represents an expression
  */
-struct Expression: x3::variant<double, x3::forward_ast<BinExpression>> {
+struct Expression: x3::variant<double, x3::forward_ast<BinExpression>, Access> {
 	using base_type::base_type;
 	using base_type::operator=;
 };

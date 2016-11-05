@@ -68,6 +68,10 @@ double VirtualMachine::operator ()(const ast::BinExpression& value) {
 	throw std::runtime_error("Invalid Opcode");
 }
 
+double VirtualMachine::operator ()(const ast::Access& value) {
+	return 0;
+}
+
 void VirtualMachine::logStm(const ast::Log& logStm) {
 	string::size_type first = 0;
 	string::size_type last;

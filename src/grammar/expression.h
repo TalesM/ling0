@@ -69,14 +69,26 @@ struct binaryOperatorWrapper {
 	}
 };
 
+struct accessWrapper {
+	template<typename Context>
+	void operator()(Context const &ctx) {
+		using namespace boost::fusion;
+		using namespace ast;
+		_val(ctx) = Access { 0 };
+	}
+};
+
 rule<class constant, ast::Expression> constant = "constant";
+rule<class access, ast::Access> access = "access";
 rule<class unary, ast::Expression> unary = "unary";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
 rule<class expression, ast::Expression> expression = "expression";
 
+auto const id = +(alnum | '_');
 auto const constant_def = double_;
-auto const unary_def = constant | ('(' >> expression >> ')');
+auto const access_def = id[accessWrapper{}];
+auto const unary_def = constant | access | ('(' >> expression >> ')');
 auto const mul_expression_def = (unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
 
 /**
@@ -90,7 +102,7 @@ auto const add_expression_def =
  */
 auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, constant)
+BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant)
 
 }
 }

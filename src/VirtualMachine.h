@@ -53,6 +53,13 @@ public:
 	 * @return
 	 */
 	double operator()(const ast::BinExpression &value);
+
+	/**
+	 *
+	 * @param value
+	 * @return
+	 */
+	double operator()(const ast::Access &value);
 private:
 	void logStm(ast::Log const &logStm);
 private:

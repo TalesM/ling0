@@ -17,7 +17,7 @@ namespace grammar {
 
 using namespace boost::spirit::x3;
 
-auto const program_id = +(alnum | '_');
+auto const program_id = id;
 
 
 rule<class string_cte, std::string> string_cte = "string_cte";
