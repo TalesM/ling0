@@ -20,6 +20,7 @@ namespace ast {
 struct BindingAccess;
 struct BinExpression;
 struct Expression;
+struct IfExpression;
 struct LogStatement;
 struct Operation;
 struct Program;
@@ -65,6 +66,7 @@ public:
 	 * @return
 	 */
 	Value operator()(const ast::BindingAccess &value);
+	Value operator()(ast::IfExpression const &value);
 private:
 	void logStm(ast::LogStatement const &logStm);
 	void pushLocal(ast::Expression const &initializer);

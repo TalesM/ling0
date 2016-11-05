@@ -20,6 +20,7 @@ namespace x3 = boost::spirit::x3;
 
 // Forward
 struct BinExpression;
+struct IfExpression;
 
 /**
  * @brief Request for use of a binding
@@ -31,7 +32,7 @@ struct BindingAccess {
 /**
  * Represents an expression
  */
-struct Expression: x3::variant<double, x3::forward_ast<BinExpression>, BindingAccess> {
+struct Expression: x3::variant<double, x3::forward_ast<BinExpression>, x3::forward_ast<IfExpression>, BindingAccess> {
 	using base_type::base_type;
 	using base_type::operator=;
 };
@@ -56,6 +57,16 @@ struct BinExpression {
 	Expression right;
 };
 
+/**
+ * @brief An conditional branch.
+ */
+struct IfExpression{
+	Expression condition;
+	Expression thenBranch;
+	//TODO ELSEIFs
+	Expression elseBranch;
+};
+
 } /* namespace ast */
 } /* namespace ling0 */
 
@@ -68,6 +79,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(ling0::ast::Expression, left),
 	(ling0::ast::BinOperation, operation),
 	(ling0::ast::Expression, right),
+)
+BOOST_FUSION_ADAPT_STRUCT(
+	ling0::ast::IfExpression,
+	(ling0::ast::Expression, condition),
+	(ling0::ast::Expression, thenBranch),
+	(ling0::ast::Expression, elseBranch),
 )
 
 #endif /* AST_EXPRESSION_H_ */

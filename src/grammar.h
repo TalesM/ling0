@@ -92,7 +92,8 @@ struct bindingWrapper {
 rule<class constant, std::string> identifier = "identifier";
 rule<class constant, ast::Expression> constant = "constant";
 rule<class access, ast::BindingAccess> access = "access";
-rule<class unary, ast::Expression> unary = "unary";
+rule<class if_expression, ast::IfExpression> if_expression = "if_expression";
+rule<class unary_expression, ast::Expression> unary_expression = "unary_expression";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
 rule<class expression, ast::Expression> expression = "expression";
@@ -105,10 +106,13 @@ rule<class program, ast::Program> program = "program";
 auto const identifier_def = +(alnum | '_');
 auto const constant_def = double_;
 auto const access_def = bindingId;
-auto const unary_def = constant | access | ('(' >> expression >> ')');
+
+auto const if_expression_def = "if" >> expression >> "then" >> expression >> "else" >> expression >> "end";
+
+auto const unary_expression_def = if_expression | constant | access | ('(' >> expression >> ')');
 
 auto const mul_expression_def =
-		(unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
+		(unary_expression >> *(multiplicativeSymbols >> unary_expression))[binaryOperatorWrapper { }];
 auto const add_expression_def = (mul_expression
 		>> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
 auto const expression_def = add_expression | double_;
@@ -124,7 +128,7 @@ auto const program_def = "program" >> identifier >> ':' >> *statement >> "end"
 		>> ';';
 
 BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte, expression,
-		add_expression, mul_expression, unary, access, constant, identifier)
+		add_expression, mul_expression, unary_expression, if_expression, access, constant, identifier)
 
 }  // namespace grammar
 

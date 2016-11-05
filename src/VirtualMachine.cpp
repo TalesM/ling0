@@ -87,6 +87,15 @@ void VirtualMachine::logStm(const ast::LogStatement& logStm) {
 	out << content.substr(first) << endl;
 }
 
+Value VirtualMachine::operator ()(ast::IfExpression const &value) {
+	auto condition = solve(value.condition);
+	if(condition){
+		return solve(value.thenBranch);
+	} else {
+		return solve(value.elseBranch);
+	}
+}
+
 void VirtualMachine::pushLocal(const ast::Expression& initializer) {
 	memory.push_back(solve(initializer));
 }
