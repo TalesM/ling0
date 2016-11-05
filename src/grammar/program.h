@@ -20,6 +20,18 @@ using namespace boost::spirit::x3;
 auto const program_id = id;
 
 
+struct bindingWrapper {
+	template<typename Context>
+	void operator()(Context const &ctx) {
+		using namespace boost::fusion;
+		using namespace ast;
+		auto const & attr = _attr(ctx);
+		bindingId.push(at_c<0>(attr));
+		_val(ctx) = Binding{at_c<1>(attr)};
+	}
+};
+
+
 rule<class string_cte, std::string> string_cte = "string_cte";
 auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
 
@@ -27,7 +39,7 @@ rule<class log, ast::Log> log = "log";
 auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')';
 
 rule<class binding, ast::Binding> binding = "binding";
-auto const binding_def = "let" >> omit[program_id] >> -("=" >> expression);
+auto const binding_def = ("let" >> id >> -("=" >> expression))[bindingWrapper{}];
 
 rule<class statement, ast::Statement> statement = "statement";
 auto const statement_def = (log | binding) >> ';';

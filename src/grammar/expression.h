@@ -49,6 +49,23 @@ struct multiplicativeSymbols_: symbols<ast::BinOperation> {
 } const multiplicativeSymbols;
 
 /**
+ * @brief Current thread's bindings.
+ *
+ * @warning This will break if there is more than one VirtualMachine at the program, even if they never exists at same time.
+ */
+thread_local struct bindingId_ : symbols<unsigned> {
+	bindingId_() {
+	}
+
+	unsigned push(std::string const &id){
+		add(id, next_id);
+		return next_id++;
+	}
+
+	unsigned next_id = 0;
+} bindingId;
+
+/**
  * Wraps binary operators sequences into the correct BinOperator tree hierarchy
  *
  * It is necessary to allow right to left priority.
@@ -69,15 +86,7 @@ struct binaryOperatorWrapper {
 	}
 };
 
-struct accessWrapper {
-	template<typename Context>
-	void operator()(Context const &ctx) {
-		using namespace boost::fusion;
-		using namespace ast;
-		_val(ctx) = Access { 0 };
-	}
-};
-
+rule<class constant, std::string> id = "id";
 rule<class constant, ast::Expression> constant = "constant";
 rule<class access, ast::Access> access = "access";
 rule<class unary, ast::Expression> unary = "unary";
@@ -85,9 +94,9 @@ rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
 rule<class expression, ast::Expression> expression = "expression";
 
-auto const id = +(alnum | '_');
+auto const id_def = +(alnum | '_');
 auto const constant_def = double_;
-auto const access_def = id[accessWrapper{}];
+auto const access_def = bindingId;
 auto const unary_def = constant | access | ('(' >> expression >> ')');
 auto const mul_expression_def = (unary >> *(multiplicativeSymbols >> unary))[binaryOperatorWrapper { }];
 
@@ -102,7 +111,7 @@ auto const add_expression_def =
  */
 auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant)
+BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant, id)
 
 }
 }

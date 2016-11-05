@@ -54,6 +54,10 @@ struct BinExpression {
 } /* namespace ling0 */
 
 BOOST_FUSION_ADAPT_STRUCT(
+		ling0::ast::Access,
+		(unsigned, id)
+)
+BOOST_FUSION_ADAPT_STRUCT(
 		ling0::ast::BinExpression,
 		(ling0::ast::Expression, left),
 		(ling0::ast::BinOperation, operation),

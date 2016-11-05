@@ -1,4 +1,7 @@
 program bindings1:
 	let a = 5;
 	log("{}", a);
+	log("{}", a + 2);
+	let b = 3;
+	log("{}", b);
 end;
