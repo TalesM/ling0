@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "grammar/program.h"
-#include "grammar/expression.h"
 
 namespace ling0 {
 using namespace boost::spirit::x3;

@@ -86,7 +86,7 @@ struct binaryOperatorWrapper {
 	}
 };
 
-rule<class constant, std::string> id = "id";
+rule<class constant, std::string> identifier = "identifier";
 rule<class constant, ast::Expression> constant = "constant";
 rule<class access, ast::Access> access = "access";
 rule<class unary, ast::Expression> unary = "unary";
@@ -94,7 +94,7 @@ rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
 rule<class expression, ast::Expression> expression = "expression";
 
-auto const id_def = +(alnum | '_');
+auto const identifier_def = +(alnum | '_');
 auto const constant_def = double_;
 auto const access_def = bindingId;
 auto const unary_def = constant | access | ('(' >> expression >> ')');
@@ -111,7 +111,7 @@ auto const add_expression_def =
  */
 auto const expression_def = add_expression | double_;
 
-BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant, id)
+BOOST_SPIRIT_DEFINE(expression, add_expression, mul_expression, unary, access, constant, identifier)
 
 }
 }

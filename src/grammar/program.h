@@ -17,9 +17,6 @@ namespace grammar {
 
 using namespace boost::spirit::x3;
 
-auto const program_id = id;
-
-
 struct bindingWrapper {
 	template<typename Context>
 	void operator()(Context const &ctx) {
@@ -39,13 +36,13 @@ rule<class log, ast::Log> log = "log";
 auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression) >>')';
 
 rule<class binding, ast::Binding> binding = "binding";
-auto const binding_def = ("let" >> id >> -("=" >> expression))[bindingWrapper{}];
+auto const binding_def = ("let" >> identifier >> -("=" >> expression))[bindingWrapper{}];
 
 rule<class statement, ast::Statement> statement = "statement";
 auto const statement_def = (log | binding) >> ';';
 
 rule<class program, ast::Program> program = "program";
-auto const program_def = "program" >> program_id >> ':' >> *statement >> "end" >> ';';
+auto const program_def = "program" >> identifier >> ':' >> *statement >> "end" >> ';';
 BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte)
 
 }  // namespace grammar
