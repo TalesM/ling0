@@ -10,11 +10,12 @@
 
 #include <iostream>
 #include <string>
-#include <boost/spirit/home/x3.hpp>
+#include <vector>
+#include <boost/variant.hpp>
 
 namespace ling0 {
 
-using Value = double;
+using Value = boost::variant<double, bool>;
 
 namespace ast {
 struct Expression;

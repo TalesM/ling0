@@ -55,7 +55,7 @@ void VirtualMachine::runProgram(const ast::Program& program) {
 			auto &content = logStm.content;
 			auto currentValue = logStm.parameters.begin();
 			while ((last = content.find("{}", first)) != string::npos) {
-				vm->out << content.substr(first, last) << vm->rawSolve(*currentValue++);
+				vm->out << std::boolalpha<< content.substr(first, last) << vm->rawSolve(*currentValue++);
 				first = last + 2;
 			}
 			vm->out << content.substr(first) << endl;
@@ -78,21 +78,24 @@ Value VirtualMachine::solve(const ast::Expression& expression) {
 
 Value VirtualMachine::rawSolve(const ast::Expression& expression) {
 	struct _: AstVisitor<Value> {
+		Value operator()(bool value){
+			return value;
+		}
 		Value operator()(const double &value) {
 			return value;
 		}
 		Value operator()(const ast::BinExpression &value) {
 			switch (value.operation) {
 			case BinOperation::ADD:
-				return vm->rawSolve(value.left) + vm->rawSolve(value.right);
+				return boost::get<double>(vm->rawSolve(value.left)) + boost::get<double>(vm->rawSolve(value.right));
 			case BinOperation::SUB:
-				return vm->rawSolve(value.left) - vm->rawSolve(value.right);
+				return boost::get<double>(vm->rawSolve(value.left)) - boost::get<double>(vm->rawSolve(value.right));
 			case BinOperation::MUL:
-				return vm->rawSolve(value.left) * vm->rawSolve(value.right);
+				return boost::get<double>(vm->rawSolve(value.left)) * boost::get<double>(vm->rawSolve(value.right));
 			case BinOperation::DIV:
-				return vm->rawSolve(value.left) / vm->rawSolve(value.right);
+				return boost::get<double>(vm->rawSolve(value.left)) / boost::get<double>(vm->rawSolve(value.right));
 			case BinOperation::MOD:
-				return fmod(vm->rawSolve(value.left), vm->rawSolve(value.right));
+				return fmod(boost::get<double>(vm->rawSolve(value.left)), boost::get<double>(vm->rawSolve(value.right)));
 			}
 			throw std::runtime_error("Invalid Opcode");
 		}
@@ -102,7 +105,7 @@ Value VirtualMachine::rawSolve(const ast::Expression& expression) {
 		}
 		Value operator()(ast::IfExpression const &value){
 			auto condition = vm->rawSolve(value.condition);
-			if(condition){
+			if(boost::get<bool>(condition)){
 				return vm->rawSolve(value.thenBranch);
 			} else {
 				return vm->rawSolve(value.elseBranch);

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "ast/Program.h"
 #include "Parser.h"
