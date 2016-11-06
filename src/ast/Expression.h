@@ -32,7 +32,7 @@ struct BindingAccess {
 /**
  * Represents an expression
  */
-struct Expression: x3::variant<double, x3::forward_ast<BinExpression>, x3::forward_ast<IfExpression>, BindingAccess> {
+struct Expression: x3::variant<double, bool, x3::forward_ast<BinExpression>, x3::forward_ast<IfExpression>, BindingAccess> {
 	using base_type::base_type;
 	using base_type::operator=;
 };

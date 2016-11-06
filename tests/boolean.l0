@@ -1,0 +1,4 @@
+program boolean:
+	log("{}", true);
+	log("{}", false);
+end;

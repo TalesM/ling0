@@ -104,7 +104,7 @@ rule<class statement, ast::Statement> statement = "statement";
 rule<class program, ast::Program> program = "program";
 
 auto const identifier_def = +(alnum | '_');
-auto const constant_def = double_;
+auto const constant_def = double_ | bool_;
 auto const access_def = bindingId;
 
 auto const if_expression_def = "if" >> expression >> "then" >> expression >> "else" >> expression >> "end";
