@@ -40,12 +40,16 @@ struct Expression: x3::variant<double, bool, x3::forward_ast<BinExpression>, x3:
 /**
  * @brief Binary operators
  */
-enum BinOperation: uint32_t {
-	ADD = '+', //!< ADD
-	SUB = '-', //!< SUB
-	MUL = '*', //!< MUL
-	DIV = '/', //!< DIV
-	MOD = '%', //!< MOD
+enum BinOperation : uint32_t {
+	ADD = '+',
+	SUB = '-',
+	MUL = '*',
+	DIV = '/',
+	MOD = '%',
+
+	AND = 'a' | 'n' << 8 | 'd' << 16,
+	OR = 'o' | 'r' << 8,
+	XOR = 'x' | 'o' << 8 | 'r' << 16,
 };
 
 /**

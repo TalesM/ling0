@@ -1,4 +1,16 @@
 program boolean:
 	log("{}", true);
 	log("{}", false);
+	log("{}", true and true);
+	log("{}", true and false);
+	log("{}", false and true);
+	log("{}", false and false);
+	log("{}", true or true);
+	log("{}", true or false);
+	log("{}", false or true);
+	log("{}", false or false);
+	log("{}", true xor true);
+	log("{}", true xor false);
+	log("{}", false xor true);
+	log("{}", false xor false);
 end;

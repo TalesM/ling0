@@ -18,27 +18,40 @@ using namespace boost::spirit::x3;
 /**
  * Checks for additive priority level symbols
  */
-struct additiveSymbols_: symbols<ast::BinOperation> {
-	additiveSymbols_() {
+struct additiveSymbol_: symbols<ast::BinOperation> {
+	additiveSymbol_() {
 		using ast::BinOperation;
 		add
 			("+", BinOperation::ADD)
 			("-", BinOperation::SUB);
 	}
-} const additiveSymbols;
+} const additiveSymbol;
 
 /**
  * Multiplicative symbols
  */
-struct multiplicativeSymbols_: symbols<ast::BinOperation> {
-	multiplicativeSymbols_() {
+struct multiplicativeSymbol_: symbols<ast::BinOperation> {
+	multiplicativeSymbol_() {
 		using ast::BinOperation;
 		add
 			("*", BinOperation::MUL)
 			("/", BinOperation::DIV)
 			("%", BinOperation::MOD);
 	}
-} const multiplicativeSymbols;
+} const multiplicativeSymbol;
+
+/**
+ * @brief Boolean symbols
+ */
+struct booleanSymbol_: symbols<ast::BinOperation> {
+	booleanSymbol_() {
+		using ast::BinOperation;
+		add
+			("and", BinOperation::AND)
+			("or", BinOperation::OR)
+			("xor", BinOperation::XOR);
+	}
+} const booleanSymbol;
 
 /**
  * @brief Current thread's bindings.
@@ -96,6 +109,7 @@ rule<class if_expression, ast::IfExpression> if_expression = "if_expression";
 rule<class unary_expression, ast::Expression> unary_expression = "unary_expression";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
+rule<class bool_expression, ast::Expression> bool_expression = "bool_expression";
 rule<class expression, ast::Expression> expression = "expression";
 rule<class string_cte, std::string> string_cte = "string_cte";
 rule<class log, ast::LogStatement> log = "log";
@@ -112,10 +126,11 @@ auto const if_expression_def = "if" >> expression >> "then" >> expression >> "el
 auto const unary_expression_def = if_expression | constant | access | ('(' >> expression >> ')');
 
 auto const mul_expression_def =
-		(unary_expression >> *(multiplicativeSymbols >> unary_expression))[binaryOperatorWrapper { }];
+		(unary_expression >> *(multiplicativeSymbol >> unary_expression))[binaryOperatorWrapper { }];
 auto const add_expression_def = (mul_expression
-		>> *(additiveSymbols >> mul_expression))[binaryOperatorWrapper { }];
-auto const expression_def = add_expression | double_;
+		>> *(additiveSymbol >> mul_expression))[binaryOperatorWrapper { }];
+auto const bool_expression_def = (add_expression >> *(booleanSymbol >> add_expression))[ binaryOperatorWrapper{} ];
+auto const expression_def = bool_expression;
 
 auto const string_cte_def = lexeme['"' >> *(char_ - '"') >> '"'];
 auto const log_def = "log" >> lit('(') >> string_cte >> *(',' >> expression)
@@ -128,7 +143,7 @@ auto const program_def = "program" >> identifier >> ':' >> *statement >> "end"
 		>> ';';
 
 BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte, expression,
-		add_expression, mul_expression, unary_expression, if_expression, access, constant, identifier)
+		add_expression, mul_expression, bool_expression,unary_expression, if_expression, access, constant, identifier)
 
 }  // namespace grammar
 

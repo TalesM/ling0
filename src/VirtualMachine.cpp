@@ -96,6 +96,15 @@ Value VirtualMachine::rawSolve(const ast::Expression& expression) {
 				return boost::get<double>(vm->rawSolve(value.left)) / boost::get<double>(vm->rawSolve(value.right));
 			case BinOperation::MOD:
 				return fmod(boost::get<double>(vm->rawSolve(value.left)), boost::get<double>(vm->rawSolve(value.right)));
+			case BinOperation::AND:
+				return boost::get<bool>(vm->rawSolve(value.left)) && boost::get<bool>(vm->rawSolve(value.right));
+			case BinOperation::OR:
+				return boost::get<bool>(vm->rawSolve(value.left)) || boost::get<bool>(vm->rawSolve(value.right));
+			case BinOperation::XOR: {
+				bool left = boost::get<bool>(vm->rawSolve(value.left));
+				bool right = boost::get<bool>(vm->rawSolve(value.right));
+				return (left && !right) || (right && !left);
+			}
 			}
 			throw std::runtime_error("Invalid Opcode");
 		}
