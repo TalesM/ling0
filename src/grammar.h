@@ -54,6 +54,16 @@ struct booleanSymbol_: symbols<ast::BinOperation> {
 } const booleanSymbol;
 
 /**
+ * @brief Boolean symbols
+ */
+struct unarySymbol_: symbols<ast::UnaryOperation> {
+	unarySymbol_() {
+		using ast::UnaryOperation;
+		add("not", UnaryOperation::NOT);
+	}
+} const unarySymbol;
+
+/**
  * @brief Current thread's bindings.
  *
  * @warning This will break if there is more than one VirtualMachine at the program, even if they never exists at same time.
@@ -91,6 +101,22 @@ struct binaryOperatorWrapper {
 	}
 };
 
+struct unaryOperatorWrapper {
+	template<typename Context>
+	void operator()(Context const &ctx) {
+		using namespace boost::fusion;
+		using namespace ast;
+
+		auto const & attr = _attr(ctx);
+		auto result = at_c<1>(attr);
+		auto &operators = at_c<0>(attr);
+		for (auto it = operators.rbegin(); it != operators.rend(); ++it ) {
+			result = UnaryExpression { *it, result};
+		}
+		_val(ctx) = result;
+	}
+};
+
 struct bindingWrapper {
 	template<typename Context>
 	void operator()(Context const &ctx) {
@@ -106,6 +132,7 @@ rule<class constant, std::string> identifier = "identifier";
 rule<class constant, ast::Expression> constant = "constant";
 rule<class access, ast::BindingAccess> access = "access";
 rule<class if_expression, ast::IfExpression> if_expression = "if_expression";
+rule<class top_level_expression, ast::Expression> top_level_expression = "top_level_expression";
 rule<class unary_expression, ast::Expression> unary_expression = "unary_expression";
 rule<class mul_expression, ast::Expression> mul_expression = "mul_expression";
 rule<class add_expression, ast::Expression> add_expression = "add_expression";
@@ -123,7 +150,8 @@ auto const access_def = bindingId;
 
 auto const if_expression_def = "if" >> expression >> "then" >> expression >> "else" >> expression >> "end";
 
-auto const unary_expression_def = if_expression | constant | access | ('(' >> expression >> ')');
+auto const top_level_expression_def = if_expression | constant | access | ('(' >> expression >> ')');
+auto const unary_expression_def = (*unarySymbol >> top_level_expression)[unaryOperatorWrapper{} ];
 
 auto const mul_expression_def =
 		(unary_expression >> *(multiplicativeSymbol >> unary_expression))[binaryOperatorWrapper { }];
@@ -143,7 +171,7 @@ auto const program_def = "program" >> identifier >> ':' >> *statement >> "end"
 		>> ';';
 
 BOOST_SPIRIT_DEFINE(program, statement, binding, log, string_cte, expression,
-		add_expression, mul_expression, bool_expression,unary_expression, if_expression, access, constant, identifier)
+		add_expression, mul_expression, bool_expression,unary_expression, if_expression, top_level_expression, access, constant, identifier)
 
 }  // namespace grammar
 

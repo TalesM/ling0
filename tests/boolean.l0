@@ -1,6 +1,8 @@
 program boolean:
 	log("{}", true);
 	log("{}", false);
+	log("{}", not true);
+	log("{}", not false);
 	log("{}", true and true);
 	log("{}", true and false);
 	log("{}", false and true);

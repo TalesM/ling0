@@ -21,6 +21,7 @@ namespace x3 = boost::spirit::x3;
 // Forward
 struct BinExpression;
 struct IfExpression;
+struct UnaryExpression;
 
 /**
  * @brief Request for use of a binding
@@ -32,7 +33,7 @@ struct BindingAccess {
 /**
  * Represents an expression
  */
-struct Expression: x3::variant<double, bool, x3::forward_ast<BinExpression>, x3::forward_ast<IfExpression>, BindingAccess> {
+struct Expression: x3::variant<double, bool, x3::forward_ast<BinExpression>, x3::forward_ast<IfExpression>, x3::forward_ast<UnaryExpression>, BindingAccess> {
 	using base_type::base_type;
 	using base_type::operator=;
 };
@@ -62,6 +63,21 @@ struct BinExpression {
 };
 
 /**
+ * @brief An unary operator
+ */
+enum UnaryOperation: uint32_t {
+	NOT = 'n' | 'o'<<8 | 't' << 16,
+};
+
+/**
+ * @brief An Unary expression
+ */
+struct UnaryExpression {
+	UnaryOperation operation;
+	Expression operand;
+};
+
+/**
  * @brief An conditional branch.
  */
 struct IfExpression{
@@ -83,6 +99,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(ling0::ast::Expression, left),
 	(ling0::ast::BinOperation, operation),
 	(ling0::ast::Expression, right),
+)
+BOOST_FUSION_ADAPT_STRUCT(
+	ling0::ast::UnaryExpression,
+	(ling0::ast::UnaryOperation, operation),
+	(ling0::ast::Expression, operand),
 )
 BOOST_FUSION_ADAPT_STRUCT(
 	ling0::ast::IfExpression,

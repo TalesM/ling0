@@ -108,6 +108,13 @@ Value VirtualMachine::rawSolve(const ast::Expression& expression) {
 			}
 			throw std::runtime_error("Invalid Opcode");
 		}
+		Value operator()(ast::UnaryExpression const &value){
+			switch (value.operation) {
+				case UnaryOperation::NOT:
+					return boost::get<bool>(vm->rawSolve(value.operand));
+			}
+			throw std::runtime_error("Invalid Opcode");
+		}
 		Value operator()(const ast::BindingAccess &value){
 			assert(value.id < vm->memory.size());
 			return vm->memory[value.id];
