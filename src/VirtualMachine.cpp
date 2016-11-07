@@ -111,7 +111,7 @@ Value VirtualMachine::rawSolve(const ast::Expression& expression) {
 		Value operator()(ast::UnaryExpression const &value){
 			switch (value.operation) {
 				case UnaryOperation::NOT:
-					return boost::get<bool>(vm->rawSolve(value.operand));
+					return !boost::get<bool>(vm->rawSolve(value.operand));
 			}
 			throw std::runtime_error("Invalid Opcode");
 		}
